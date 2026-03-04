@@ -1,0 +1,82 @@
+[
+  {
+    "id": "CA-SJV",
+    "name": "California Central Valley",
+    "lat": 36.7,
+    "lon": -119.7,
+    "primary_crop": "Almonds/Tomatoes",
+    "climate": "semi-arid"
+  },
+  {
+    "id": "IA-CRN",
+    "name": "Iowa Corn Belt",
+    "lat": 42.0,
+    "lon": -93.5,
+    "primary_crop": "Corn/Soybeans",
+    "climate": "continental"
+  },
+  {
+    "id": "TX-HPL",
+    "name": "Texas High Plains",
+    "lat": 33.5,
+    "lon": -101.9,
+    "primary_crop": "Cotton/Wheat",
+    "climate": "semi-arid"
+  },
+  {
+    "id": "FL-EGL",
+    "name": "Florida Everglades AG",
+    "lat": 26.6,
+    "lon": -80.7,
+    "primary_crop": "Sugarcane/Rice",
+    "climate": "subtropical"
+  },
+  {
+    "id": "WA-YKM",
+    "name": "Washington Yakima Valley",
+    "lat": 46.6,
+    "lon": -120.5,
+    "primary_crop": "Apples/Hops",
+    "climate": "semi-arid"
+  },
+  {
+    "id": "KS-GBL",
+    "name": "Kansas Great Plains",
+    "lat": 38.7,
+    "lon": -98.3,
+    "primary_crop": "Winter Wheat",
+    "climate": "continental"
+  },
+  {
+    "id": "GA-PDP",
+    "name": "Georgia Piedmont",
+    "lat": 33.1,
+    "lon": -83.6,
+    "primary_crop": "Peanuts/Peaches",
+    "climate": "humid subtropical"
+  },
+  {
+    "id": "ND-RED",
+    "name": "North Dakota Red River",
+    "lat": 47.2,
+    "lon": -97.1,
+    "primary_crop": "Wheat/Sunflower",
+    "climate": "continental"
+  },
+  {
+    "id": "CO-SLV",
+    "name": "Colorado San Luis Valley",
+    "lat": 37.5,
+    "lon": -106.0,
+    "primary_crop": "Potatoes/Barley",
+    "climate": "high desert"
+  },
+  {
+    "id": "MS-DEL",
+    "name": "Mississippi Delta",
+    "lat": 33.4,
+    "lon": -90.9,
+    "primary_crop": "Cotton/Soybeans",
+    "climate": "humid subtropical"
+  }
+]
