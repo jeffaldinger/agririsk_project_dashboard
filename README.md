@@ -2,7 +2,7 @@
 
 A local Streamlit dashboard that monitors **drought, frost, and flood risk** across US agricultural regions using synthetic weather and vegetation (NDVI) data.
 
-Built as a portfolio demonstration of agricultural data analysis, risk modeling, and interactive visualization.
+Example demonstration of agricultural data analysis, risk modeling, and interactive visualization.
 
 ---
 

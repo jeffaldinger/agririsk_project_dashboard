@@ -77,6 +77,12 @@ st.markdown("""
   .alert-high     { background: #431407; border-left: 3px solid #fb923c; border-radius: 6px; padding: 10px 14px; margin: 4px 0; }
   .alert-moderate { background: #422006; border-left: 3px solid #facc15; border-radius: 6px; padding: 10px 14px; margin: 4px 0; }
 
+  /* Sidebar */
+  section[data-testid="stSidebar"] {
+    background-color: #0d1117 !important;
+    border-right: 1px solid #21262d;
+  }
+
   /* Section headers */
   .section-label {
     font-family: 'Space Mono', monospace;
@@ -107,7 +113,7 @@ st.markdown("""
 # ── Data loading ──────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
-    base = os.path.dirname(__file__)
+    base = os.path.dirname(os.path.abspath(__file__))
     daily   = pd.read_csv(f"{base}/data/daily_weather_ndvi.csv",  parse_dates=["date"])
     monthly = pd.read_csv(f"{base}/data/monthly_aggregates.csv")
     risk_df = compute_risks(monthly, daily)
@@ -120,6 +126,7 @@ snapshot   = get_latest_snapshot(risk_df)
 all_regions = sorted(risk_df["region_name"].unique())
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
+
 with st.sidebar:
     st.markdown('<p class="section-label">🌾 AgriRisk Dashboard</p>', unsafe_allow_html=True)
     st.markdown("---")
@@ -225,7 +232,7 @@ with col_map:
     st.markdown('<p class="section-label">Regional Risk Map</p>', unsafe_allow_html=True)
 
     risk_label = risk_type.replace("_score", "").title()
-    fig_map = px.scatter_mapbox(
+    fig_map = px.scatter_map(
         filtered_risk,
         lat="lat", lon="lon",
         size=risk_type,
@@ -245,7 +252,7 @@ with col_map:
         size_max=35,
         zoom=3.2,
         center={"lat": 39, "lon": -98},
-        mapbox_style="carto-darkmatter",
+        map_style="carto-darkmatter",
         title=f"{risk_label} Risk — {selected_month}",
         labels={risk_type: f"{risk_label} Score"},
     )
