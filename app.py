@@ -107,15 +107,23 @@ st.markdown("""
 
 # ── Data loading ──────────────────────────────────────────────────────────────
 @st.cache_data
-def load_data():
+def load_data(use_live: bool = False):
     base = os.path.dirname(os.path.abspath(__file__))
-    daily   = pd.read_csv(f"{base}/data/daily_weather_ndvi.csv",  parse_dates=["date"])
-    monthly = pd.read_csv(f"{base}/data/monthly_aggregates.csv")
+    if use_live:
+        daily_path   = f"{base}/data/live_daily_weather.csv"
+        monthly_path = f"{base}/data/live_monthly_aggregates.csv"
+    else:
+        daily_path   = f"{base}/data/daily_weather_ndvi.csv"
+        monthly_path = f"{base}/data/monthly_aggregates.csv"
+    daily   = pd.read_csv(daily_path,   parse_dates=["date"])
+    monthly = pd.read_csv(monthly_path)
     risk_df = compute_risks(monthly, daily)
     return daily, monthly, risk_df
 
+_base = os.path.dirname(os.path.abspath(__file__))
+_use_live = os.path.exists(os.path.join(_base, "data", "live_daily_weather.csv"))
 with st.spinner("Loading field intelligence data…"):
-    daily_df, monthly_df, risk_df = load_data()
+    daily_df, monthly_df, risk_df = load_data(use_live=_use_live)
 
 snapshot   = get_latest_snapshot(risk_df)
 all_regions = sorted(risk_df["region_name"].unique())
@@ -123,6 +131,30 @@ all_regions = sorted(risk_df["region_name"].unique())
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown('<p class="section-label">🌾 AgriRisk Dashboard</p>', unsafe_allow_html=True)
+    if _use_live:
+        st.markdown(
+            '<span style="background:#1a3a1a;color:#4ade80;font-size:0.7rem;padding:3px 8px;'
+            'border-radius:4px;border:1px solid #2d4a2d">🟢 LIVE DATA (Open-Meteo)</span>',
+            unsafe_allow_html=True
+        )
+    else:
+        st.markdown(
+            '<span style="background:#1a1a2e;color:#8b949e;font-size:0.7rem;padding:3px 8px;'
+            'border-radius:4px;border:1px solid #21262d">⚪ SYNTHETIC DATA</span>',
+            unsafe_allow_html=True
+        )
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🔄 Refresh Live Weather", use_container_width=True):
+        with st.spinner("Fetching live data from Open-Meteo…"):
+            import subprocess
+            subprocess.run(
+                ["python", os.path.join(_base, "data", "refresh_live_data.py")],
+                check=True
+            )
+            load_data.clear()
+        st.rerun()
+
     st.markdown("---")
 
     st.markdown('<p class="section-label">Filters</p>', unsafe_allow_html=True)
