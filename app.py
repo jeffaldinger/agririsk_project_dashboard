@@ -146,12 +146,28 @@ with st.sidebar:
     
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🔄 Refresh Live Weather", use_container_width=True):
-        with st.spinner("Fetching live data from Open-Meteo…"):
-            import subprocess
-            subprocess.run(
-                ["python", os.path.join(_base, "data", "refresh_live_data.py")],
-                check=True
-            )
+        with st.spinner("Fetching live data from Open-Meteo… (~30 sec)"):
+            from engine.weather_fetcher import fetch_all_regions, build_monthly_aggregates
+
+            daily_live = fetch_all_regions(verbose=False)
+
+            synthetic = pd.read_csv(os.path.join(_base, "data", "daily_weather_ndvi.csv"), parse_dates=["date"])
+            synthetic["doy"]  = synthetic["date"].dt.dayofyear
+            daily_live["doy"] = daily_live["date"].dt.dayofyear
+            ndvi_lookup = synthetic.groupby(["region_id", "doy"])["ndvi"].mean().reset_index()
+            daily_live  = daily_live.merge(ndvi_lookup, on=["region_id", "doy"], how="left")
+            daily_live["ndvi"] = daily_live["ndvi"].interpolate().clip(0, 1).round(4)
+            daily_live.drop(columns=["doy"], inplace=True)
+
+            monthly_live = build_monthly_aggregates(daily_live)
+            daily_live["month"] = daily_live["date"].dt.to_period("M").astype(str)
+            ndvi_monthly = daily_live.groupby(["region_id", "month"]).agg(
+                ndvi_mean=("ndvi", "mean"), ndvi_min=("ndvi", "min")
+            ).reset_index()
+            monthly_live = monthly_live.merge(ndvi_monthly, on=["region_id", "month"], how="left")
+
+            daily_live.to_csv(os.path.join(_base, "data", "live_daily_weather.csv"), index=False)
+            monthly_live.to_csv(os.path.join(_base, "data", "live_monthly_aggregates.csv"), index=False)
             load_data.clear()
         st.rerun()
 
