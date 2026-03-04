@@ -14,6 +14,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from engine.risk_engine import compute_risks, get_latest_snapshot, get_active_alerts
+from engine.report_generator import generate_pdf_report, generate_csv_export
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -77,12 +78,6 @@ st.markdown("""
   .alert-high     { background: #431407; border-left: 3px solid #fb923c; border-radius: 6px; padding: 10px 14px; margin: 4px 0; }
   .alert-moderate { background: #422006; border-left: 3px solid #facc15; border-radius: 6px; padding: 10px 14px; margin: 4px 0; }
 
-  /* Sidebar */
-  section[data-testid="stSidebar"] {
-    background-color: #0d1117 !important;
-    border-right: 1px solid #21262d;
-  }
-
   /* Section headers */
   .section-label {
     font-family: 'Space Mono', monospace;
@@ -126,7 +121,6 @@ snapshot   = get_latest_snapshot(risk_df)
 all_regions = sorted(risk_df["region_name"].unique())
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
-
 with st.sidebar:
     st.markdown('<p class="section-label">🌾 AgriRisk Dashboard</p>', unsafe_allow_html=True)
     st.markdown("---")
@@ -156,6 +150,36 @@ with st.sidebar:
     # month selector
     all_months = sorted(risk_df["month"].unique())
     selected_month = st.selectbox("Analysis month", options=all_months, index=len(all_months)-1)
+
+    st.markdown("---")
+    st.markdown('<p class="section-label">Export Report</p>', unsafe_allow_html=True)
+
+    export_region = st.selectbox(
+        "Region to export",
+        options=all_regions,
+        key="export_region",
+    )
+
+    with st.spinner("Preparing PDF..."):
+        pdf_bytes = generate_pdf_report(export_region, risk_df)
+
+    safe_name = export_region.replace(" ", "_").replace("/", "-")
+    st.download_button(
+        label="Download PDF Report",
+        data=pdf_bytes,
+        file_name=f"AgriRisk_{safe_name}_{selected_month}.pdf",
+        mime="application/pdf",
+        use_container_width=True,
+    )
+
+    csv_bytes = generate_csv_export(export_region, risk_df)
+    st.download_button(
+        label="Download CSV Data",
+        data=csv_bytes,
+        file_name=f"AgriRisk_{safe_name}_data.csv",
+        mime="text/csv",
+        use_container_width=True,
+    )
 
     st.markdown("---")
     st.markdown("""
